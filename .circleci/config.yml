@@ -35,6 +35,7 @@ jobs:
       - run:
           name: Build and push the Docker image
           command: |
+            ls -a
             docker build -t cicd/circleci-demo:latest .
       
       - save_cache:
