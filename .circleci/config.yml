@@ -34,7 +34,10 @@ jobs:
           version: 18.05.0-ce
           docker_layer_caching: true
           
-      - run: mvn dependency:go-offline
+      - run: mvn package
+      
+      - store_artifacts:
+          path: target/circlecidemo-0.0.1-SNAPSHOT.jar
       
       - run:
           name: Build and push the Docker image
