@@ -44,7 +44,14 @@ jobs:
           command: |
             ls -a
             docker build -t cicd/circleci-demo:latest .
-      
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --no-cache \
+              py-pip=9.0.0-r1
+            pip install \
+              awscli==1.11.76
+              
       - save_cache:
           paths:
             - ~/.m2
