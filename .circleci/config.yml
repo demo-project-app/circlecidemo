@@ -38,20 +38,13 @@ jobs:
       
       - store_artifacts:
           path: target/circlecidemo-0.0.1-SNAPSHOT.jar
-      
-      - run:
-          name: Build and push the Docker image
-          command: |
-            ls -a
-            docker build -t cicd/circleci-demo:latest .
             
       - run:
-          name: Install dependencies
+          name: Install aws cli
           command: |
-            sudo apt-get install python-pip
-            pip install \
-              docker-compose==1.12.0 \
-              awscli==1.11.76
+            curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+            unzip awscli-bundle.zip
+            sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
               
       - deploy:
           name: Push application Docker image
@@ -59,8 +52,9 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               login="$(aws ecr get-login)"
               ${login}
-              docker tag cicd/circlecidemo:latest "${ECR_ENDPOINT}/app:latest"
-              docker push "${ECR_ENDPOINT}/app:latest"
+              docker build  -t cicd/circlecidemo .
+              docker tag cicd/circlecidemo:latest ${ACC_ID}.dkr.ecr.us-east-2.amazonaws.com/app:latest
+              docker push ${ACC_ID}.dkr.ecr.us-east-2.amazonaws.com/app:latest
             fi
               
       - save_cache:
