@@ -81,6 +81,7 @@ jobs:
                   ]
                 }
               ]'
+              
               echo "$task_template"
               task_def=$(printf "$task_template" $TASK $ACC_ID $AWS_REGION $TASK $CIRCLE_SHA1)
               
