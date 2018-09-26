@@ -86,13 +86,24 @@ jobs:
               task_def=$(printf "$task_template" $TASK $ACC_ID $AWS_REGION $TASK $CIRCLE_SHA1)
               
               # Register the task definition
-              json=$(aws ecs register-task-definition --container-definitions "$task_def" --family "$FAMILY")
+              if json=$(aws ecs register-task-definition --container-definitions "$task_def" --family "$FAMILY") then
+                  echo "Task Registration: $json"
+              else
+                  echo "Failed to register task definition"
+                  return 1
+              fi
               
               # Grab revision # using regular bash and grep
               revision=$(echo "$json" | grep -o '"revision": [0-9]*' | grep -Eo '[0-9]+')
+              echo "Revision: $revision"
               
               # Deploy revision
-              aws ecs update-service --cluster "$CLUSTER" --service "$SERVICE" --task-definition "$TASK":"$revision"
+              if service=aws ecs update-service --cluster "$CLUSTER" --service "$SERVICE" --task-definition "$TASK":"$revision" then
+                echo  echo "Service Updated: $service"
+              else
+                 echo "Error updating service."
+                 return 1
+              fi
             fi
               
       - save_cache:
