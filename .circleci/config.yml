@@ -50,12 +50,49 @@ jobs:
           name: Push application Docker image
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              
+              #Variables
+              CLUSTER='cicd-app'
+              FAMILY='cicd-app'
+              DOCKER_IMAGE='test-app'
+              TASK='cicd-app'
+              SERVICE='cicd-app'
+              
+              #Aws Login
               aws configure set region ${AWS_REGION}
               login="$(aws ecr get-login --no-include-email)"
               ${login}
               docker build  -t cicd/circlecidemo .
               docker tag cicd/circlecidemo:latest ${ACC_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/app:$CIRCLE_SHA1
               docker push ${ACC_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/app:$CIRCLE_SHA1
+              
+              # Create a task for deployement
+              task_template='[
+                {
+                  "name": "%s",
+                  "image": "%s.dkr.ecr.%s.amazonaws.com/%s:%s",
+                  "essential": true,
+                  "memoryReservation": 1000,
+                  "portMappings": [
+                    {
+                      "containerPort": 8080,
+                      "hostPort": 8080
+                    }
+                  ]
+                }
+              ]'
+              echo "$task_template"
+              task_def=$(printf "$task_template" $TASK $ACC_ID $AWS_REGION $TASK $CIRCLE_SHA1)
+              
+              # Register the task definition
+              json=$(aws ecs register-task-definition --container-definitions "$task_def" --family "$FAMILY")
+              
+              # Grab revision # using regular bash and grep
+              revision=$(echo "$json" | grep -o '"revision": [0-9]*' | grep -Eo '[0-9]+')
+              
+              # Deploy revision
+              aws ecs update-service --cluster "$CLUSTER" --service "$SERVICE" --task-definition "$TASK":"$revision"
+              return 0
             fi
               
       - save_cache:
