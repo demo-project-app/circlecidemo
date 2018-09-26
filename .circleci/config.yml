@@ -85,6 +85,12 @@ jobs:
               echo "$task_template"
               task_def=$(printf "$task_template" $TASK $ACC_ID $AWS_REGION $TASK $CIRCLE_SHA1)
               
+               # Stop the old task
+              if task_id=$(aws ecs list-tasks --cluster $CLUSTER --desired-status RUNNING --family FAMILY | egrep "task" | tr "/" " " | tr "[" " " |  awk '{print $2}' | sed 's/"$//'); then
+                  echo "STOPPING TASK : $task_id"
+                  aws ecs stop-task --cluster default --task $task_id
+              fi
+              
               # Register the task definition
               if json=$(aws ecs register-task-definition --container-definitions "$task_def" --family "$FAMILY"); then
                   echo "Task Registration: $json"
