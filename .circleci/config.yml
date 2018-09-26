@@ -86,7 +86,7 @@ jobs:
               task_def=$(printf "$task_template" $TASK $ACC_ID $AWS_REGION $TASK $CIRCLE_SHA1)
               
               # Register the task definition
-              if json=$(aws ecs register-task-definition --container-definitions "$task_def" --family "$FAMILY") then
+              if json=$(aws ecs register-task-definition --container-definitions "$task_def" --family "$FAMILY"); then
                   echo "Task Registration: $json"
               else
                   echo "Failed to register task definition"
@@ -98,7 +98,7 @@ jobs:
               echo "Revision: $revision"
               
               # Deploy revision
-              if service=aws ecs update-service --cluster "$CLUSTER" --service "$SERVICE" --task-definition "$TASK":"$revision" then
+              if service=$(aws ecs update-service --cluster "$CLUSTER" --service "$SERVICE" --task-definition "$TASK":"$revision"); then
                 echo  echo "Service Updated: $service"
               else
                  echo "Error updating service."
