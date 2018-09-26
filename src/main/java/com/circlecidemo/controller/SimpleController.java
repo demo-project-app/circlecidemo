@@ -8,7 +8,7 @@ public class SimpleController {
 
 	@RequestMapping("/")
 	public String welcome() {
-		return "AWS Demo App";
+		return "Circle CI - AWS Demo App";
 	}
 	
 }
