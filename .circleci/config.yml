@@ -63,8 +63,8 @@ jobs:
               login="$(aws ecr get-login --no-include-email)"
               ${login}
               docker build  -t cicd/circlecidemo .
-              docker tag cicd/circlecidemo:latest ${ACC_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/app:$CIRCLE_SHA1
-              docker push ${ACC_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/app:$CIRCLE_SHA1
+              docker tag cicd/circlecidemo:latest ${ACC_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/cicd-app:$CIRCLE_SHA1
+              docker push ${ACC_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/cicd-app:$CIRCLE_SHA1
               
               # Create a task for deployement
               task_template='[
