@@ -54,7 +54,6 @@ jobs:
               #Variables
               CLUSTER='cicd-app'
               FAMILY='cicd-app'
-              DOCKER_IMAGE='test-app'
               TASK='cicd-app'
               SERVICE='cicd-service'
               
