@@ -13,7 +13,8 @@ jobs:
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/postgres:9.4
-
+    
+    #In which directory to run the steps
     working_directory: ~/repo
 
     environment:
@@ -30,24 +31,28 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
       
+      #Creates a remote Docker environment configured to execute Docker commands
       - setup_remote_docker:
           version: 18.05.0-ce
           docker_layer_caching: true
-          
+      
+      #Creates the final jar
       - run: mvn package
       
       - store_artifacts:
           path: target/circlecidemo-0.0.1-SNAPSHOT.jar
-            
+      
+      #Install aws command line interface to trigger aws commands
       - run:
           name: Install aws cli
           command: |
             curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
             unzip awscli-bundle.zip
             sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-              
+      
+      #Build and push the docker image to aws - cluster -> task -> service
       - deploy:
-          name: Push application Docker image
+          name: Build and Push application Docker image
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               
