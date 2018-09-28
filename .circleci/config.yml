@@ -91,6 +91,7 @@ jobs:
                   aws ecs stop-task --cluster $CLUSTER --task $task_id
               fi
               
+              
               # Register the task definition
               if json=$(aws ecs register-task-definition --container-definitions "$task_def" --family "$FAMILY"); then
                   echo "Task Registration: $json"
