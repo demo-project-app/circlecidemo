@@ -87,7 +87,7 @@ jobs:
               
                # Stop the old task
               if task_id=$(aws ecs list-tasks --cluster $CLUSTER --desired-status RUNNING --family $FAMILY | egrep "task" | tr "/" " " | tr "[" " " |  awk '{print $2}' | sed 's/"$//'); then
-                  if [ task_id != ']' ]; then
+                  if [ task_id != ] ]; then
                     echo "STOPPING TASK : $task_id"
                     aws ecs stop-task --cluster $CLUSTER --task $task_id
                   fi
